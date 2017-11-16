@@ -5,37 +5,35 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  Buttons, Menus, StdCtrls, ActnList, ComCtrls;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
+  ExtCtrls, Buttons, Spin, Menus, StdCtrls, UFigures;
 
 type
 
-  { TVectorEditor }
+  { TForm1 }
 
-  TVectorEditor = class(TForm)
-    ColorDialog1: TColorDialog;
-    Panel1 : TPanel;
-    bwidth: TLabel;
+  TForm1 = class(TForm)
+    ColorDialog: TColorDialog;
+    Label1: TLabel;
     MainMenu: TMainMenu;
-    bFile: TMenuItem;
+    MenuItem: TMainMenu;
     Help: TMenuItem;
-    FileExit: TMenuItem;
-    FileSave: TMenuItem;
-    SaveFile: TSaveDialog;
-    bColor: TSpeedButton;
+    FileIteam: TMenuItem;
+    SaveDialog: TSaveDialog;
+    SaveFile: TMenuItem;
+    CloseAll: TMenuItem;
+    PaintBox: TPaintBox;
+    Panel1: TPanel;
+    bcolor: TSpeedButton;
     bBrush: TSpeedButton;
     bLine: TSpeedButton;
     bEllipse: TSpeedButton;
     bRectangle: TSpeedButton;
-    Trackwidth: TTrackBar;
-    PaintBox: TPaintBox;
-    procedure bEllipseClick(Sender: TObject);
-    procedure bLineClick(Sender: TObject);
-    procedure bRectangleClick(Sender: TObject);
-    procedure FileSaveClick(Sender: TObject);
+    SpinEdit: TSpinEdit;
     procedure FormCreate(Sender: TObject);
-    procedure FileExitClick(Sender: TObject);
+    procedure CloseAllClick(Sender: TObject);
     procedure HelpClick(Sender: TObject);
+    procedure SaveFileClick(Sender: TObject);
     procedure PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure PaintBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -43,118 +41,57 @@ type
     procedure PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure PaintBoxPaint(Sender: TObject);
-    procedure bColorClick(Sender: TObject);
+    procedure bcolorClick(Sender: TObject);
     procedure bBrushClick(Sender: TObject);
-    procedure TrackwidthChange(Sender: TObject);
+    procedure SpinEditChange(Sender: TObject);
+
+
   private
     { private declarations }
   public
     { public declarations }
   end;
 
-  type allThings = record
-    line : array of TPoint;
-    lineLength : integer;
-    color : TColor;
-    name : string;
-    width : integer;
-    end;
 var
-  VectorEditor: TVectorEditor;
-  i,j,penState, length: integer;
-  drawing : boolean;
-  allLine : array of allThings;
+  Form1: TForm1;
+  Figures: array of TFigure;
+  CurrentFigure: TFigure;
+  FigureColor: TColor;
+  isDrawing, isClicked: Boolean;
+  ToolNum, FigureWidth: Byte;
+
 
 implementation
-
 {$R *.lfm}
-{ TVectorEditor }
 
-procedure TVectorEditor.PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+{ TForm1 }
+
+
+procedure TForm1.FormCreate(Sender: TObject);
 begin
-  if drawing = true then
-    begin
-     case penState of
-     1: begin
-        allLine[length-1].name := 'brush';
-       end;
-     2: begin
-          allLine[length-1].line[1].x := x;
-          allLine[length-1].line[1].y := y;
-          PaintBox.Canvas.Line(allLine[length-1].line[0].x,allLine[length-1].line[0].y,allLine[length-1].line[1].x,allLine[length-1].line[1].y);
-          allLine[length-1].name := 'line';
-        end;
-     3: begin
-          allLine[length-1].line[1].x := x;
-          allLine[length-1].line[1].y := y;
-          PaintBox.Canvas.Ellipse(allLine[length-1].line[0].x,allLine[length-1].line[0].y,allLine[length-1].line[1].x,allLine[length-1].line[1].y);
-          allLine[length-1].name := 'Ellipse';
-        end;
-     4: begin
-          allLine[length-1].line[1].x := x;
-          allLine[length-1].line[1].y := y;
-          PaintBox.Canvas.Rectangle(allLine[length-1].line[0].x,allLine[length-1].line[0].y,allLine[length-1].line[1].x,allLine[length-1].line[1].y);
-          allLine[length-1].name := 'Rectangle';
-        end;
-     end;
-    drawing:= false;
-
-
-   end;
+   isClicked:= true;
+   ToolNum:=0;
+   Form1.DoubleBuffered:=true;
 end;
 
-procedure TVectorEditor.PaintBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: Integer);
+procedure TForm1.CloseAllClick(Sender: TObject);
 begin
-   if drawing then
-   begin
-
-   if (penState = 1) then
-    begin
-      allLine[length-1].lineLength := allLine[length-1].lineLength+1;
-      setlength(allLine[length-1].line, allLine[length-1].lineLength);
-      allLine[length-1].line[allLine[length-1].lineLength-1].x := x;
-      allLine[length-1].line[allLine[length-1].lineLength-1].y := y;
-
-      PaintBox.Canvas.LineTo(x,y);
-
-    end;
-   end;
+    Close;
 end;
 
-procedure TVectorEditor.PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TForm1.HelpClick(Sender: TObject);
 begin
-   PaintBox.Canvas.MoveTo(x,y);
-    if ssleft in shift then
-    begin
-      drawing := true;
-      length:=length+1;
-      setlength(allLine,length);
-      allLine[length-1].lineLength:=0;
-      allLine[length-1].color := PaintBox.Canvas.Pen.Color;
-      allLine[length-1].width := PaintBox.Canvas.Pen.Width;
-
-    if (penState <> 1) then
-     begin
-      allLine[length-1].lineLength := 2;
-      setlength(allLine[length-1].line, allLine[length-1].lineLength);
-      allLine[length-1].line[0].x := x;
-      allLine[length-1].line[0].y := y;
-     end;
-
-    end;
+    ShowMessage('Редактор создан Самутиой Натальей');
 end;
 
-procedure TVectorEditor.FileSaveClick(Sender: TObject);
-  var
-  Bitmap: TBitmap;
-  Source: TRect;
-  Dest: TRect;
+procedure TForm1.SaveFileClick(Sender: TObject);
+var
+    Bitmap: TBitmap;
+    Source: TRect;
+    Dest: TRect;
 begin
 
-  if SaveFile.Execute then
+  if (SaveDialog.Execute) then
   begin
    Bitmap := TBitmap.Create;
   try
@@ -163,95 +100,88 @@ begin
     Dest := Rect(0, 0, Bitmap.Width, Bitmap.Height);
     Source := Rect(0, 0, PaintBox.Width, PaintBox.Height);
     Bitmap.Canvas.CopyRect(Dest, PaintBox.Canvas, Source);
-    Bitmap.SaveToFile(SaveFile.FileName);
+    Bitmap.SaveToFile(SaveDialog.FileName);
   finally
     Bitmap.Free;
   end;
-end;
-end;
-
-procedure TVectorEditor.FormCreate(Sender: TObject);
-begin
-  penState := 1;
-  length := 0;
-end;
-
-procedure TVectorEditor.FileExitClick(Sender: TObject);
-begin
-  Close;
-end;
-
-procedure TVectorEditor.HelpClick(Sender: TObject);
-begin
-  Application.MessageBox('Эта программа была сделана Самутиной Натальей студенткой первого курса Прикладной математики и Информатики', 'Справка');
-end;
-
-
-procedure TVectorEditor.PaintBoxPaint(Sender: TObject);
-begin
-  PaintBox.Canvas.FillRect(0,0,PaintBox.Canvas.width,PaintBox.Canvas.height);
-
-  if (length <> 0) then
-  begin
-  For i := 0 to length-1 do
-  begin
-
-     PaintBox.Canvas.Pen.Color := allLine[i].color;
-     PaintBox.Canvas.Pen.Width := allLine[i].width;
-
-     if (allLine[i].name = 'line') then
-     PaintBox.Canvas.Line(allLine[i].line[0].x,allLine[i].line[0].y,allLine[i].line[1].x,allLine[i].line[1].y);
-
-     if (allLine[i].name = 'Ellipse') then
-     PaintBox.Canvas.Ellipse(allLine[i].line[0].x,allLine[i].line[0].y,allLine[i].line[1].x,allLine[i].line[1].y);
-
-     if (allLine[i].name = 'Rectangle') then
-     PaintBox.Canvas.Rectangle(allLine[i].line[0].x,allLine[i].line[0].y,allLine[i].line[1].x,allLine[i].line[1].y);
-
-     if (allLine[i].name = 'brush') then
-     PaintBox.Canvas.PolyLine(allLine[i].line[0..allLine[i].lineLength-1]);
-
-
-
-  end;
 
   end;
 end;
 
-procedure TVectorEditor.bColorClick(Sender: TObject);
+procedure TForm1.PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 begin
-  if ColorDialog1.Execute then
+
+    if (isClicked) then
+     begin
+      isDrawing := True;
+
+     case ToolNum of
+      0: CurrentFigure := TPolyLine.Create;
+      1: CurrentFigure := TRectangle.Create;
+      2: CurrentFigure := TEllipse.Create;
+      3: CurrentFigure := TLine.Create;
+     end;
+      CurrentFigure.Color := FigureColor;
+      CurrentFigure.Width := FigureWidth;
+      CurrentFigure.FirstPoint := Point(X, Y);
+    end;
+
+end;
+
+
+
+procedure TForm1.PaintBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+   if(isDrawing) then
+    begin
+      PaintBox.Refresh;
+      CurrentFigure.MouseMove(X, Y);
+      CurrentFigure.LastPoint := Point(X, Y);
+      CurrentFigure.Draw(PaintBox.Canvas);
+    end;
+end;
+
+procedure TForm1.PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+
+begin
+   if(isDrawing) then
   begin
-  PaintBox.Canvas.Pen.Color:= ColorDialog1.Color ;
+    isDrawing := False;
+    CurrentFigure.LastPoint := Point(X, Y);
+    CurrentFigure.MouseMove(X, Y);
+    CurrentFigure.Draw(PaintBox.Canvas);
+    SetLength(Figures, length(Figures) + 1);
+    Figures[High(Figures)] := CurrentFigure;
   end;
+
 end;
 
-procedure TVectorEditor.bBrushClick(Sender: TObject);
+procedure TForm1.PaintBoxPaint(Sender: TObject);
+ var F: TFigure;
 begin
-  penState := 1;
+    PaintBox.Canvas.Pen.Color := ClWhite;
+    PaintBox.Canvas.FillRect(0, 0, PaintBox.Width, PaintBox.Height);
+    for F in Figures do F.Draw(PaintBox.Canvas);
 end;
 
-procedure TVectorEditor.bLineClick(Sender: TObject);
+procedure TForm1.bcolorClick(Sender: TObject);
 begin
-  penState := 2;
+   if((ColorDialog.Execute) and (isClicked)) then
+   FigureColor := ColorDialog.Color;
 end;
 
-procedure TVectorEditor.bRectangleClick(Sender: TObject);
+procedure TForm1.bBrushClick(Sender: TObject);
 begin
-  penState := 4;
+   isClicked := True;
+   ToolNum := (Sender as TSpeedButton).Tag;
 end;
 
-procedure TVectorEditor.bEllipseClick(Sender: TObject);
+procedure TForm1.SpinEditChange(Sender: TObject);
 begin
-  penState := 3;
+  if(isClicked) then FigureWidth := SpinEdit.Value;
 end;
-
-
-procedure TVectorEditor.TrackwidthChange(Sender: TObject);
-begin
-    PaintBox.Canvas.Pen.Width:= Trackwidth.Position;
-end;
-
-
 end.
 
