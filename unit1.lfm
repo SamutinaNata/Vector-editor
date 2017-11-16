@@ -1,0 +1,144 @@
+object VectorEditor: TVectorEditor
+  Left = 493
+  Height = 531
+  Top = 172
+  Width = 504
+  Caption = 'Векторный Редактор'
+  ClientHeight = 511
+  ClientWidth = 504
+  Color = clBtnHighlight
+  Menu = MainMenu
+  OnCreate = FormCreate
+  LCLVersion = '1.6.4.0'
+  object PaintBox: TPaintBox
+    Left = 0
+    Height = 469
+    Top = 42
+    Width = 504
+    Align = alClient
+    Color = clWindow
+    ParentColor = False
+    OnMouseDown = PaintBoxMouseDown
+    OnMouseMove = PaintBoxMouseMove
+    OnMouseUp = PaintBoxMouseUp
+    OnPaint = PaintBoxPaint
+  end
+  object Panel1: TPanel
+    Left = 0
+    Height = 42
+    Top = 0
+    Width = 504
+    Align = alTop
+    ClientHeight = 42
+    ClientWidth = 504
+    TabOrder = 0
+    object bColor: TSpeedButton
+      Left = 0
+      Height = 41
+      Top = 0
+      Width = 64
+      Caption = 'Цвет'
+      OnClick = bColorClick
+    end
+    object Trackwidth: TTrackBar
+      Left = 64
+      Height = 25
+      Top = 16
+      Width = 100
+      OnChange = TrackwidthChange
+      Position = 0
+      TabOrder = 0
+    end
+    object bwidth: TLabel
+      Left = 72
+      Height = 15
+      Top = 0
+      Width = 81
+      Caption = 'Толщина пера'
+      ParentColor = False
+    end
+    object bBrush: TSpeedButton
+      Left = 168
+      Height = 41
+      Top = 0
+      Width = 48
+      Caption = 'Перо'
+      OnClick = bBrushClick
+    end
+    object bLine: TSpeedButton
+      Left = 224
+      Height = 41
+      Top = 0
+      Width = 48
+      Caption = 'Линия'
+      OnClick = bLineClick
+    end
+    object bEllipse: TSpeedButton
+      Left = 280
+      Height = 41
+      Top = 1
+      Width = 48
+      Caption = 'Эллипс'
+      OnClick = bEllipseClick
+    end
+    object bRectangle: TSpeedButton
+      Left = 336
+      Height = 41
+      Top = 0
+      Width = 96
+      Caption = 'Прямоугольник'
+      OnClick = bRectangleClick
+    end
+  end
+  object MainMenu: TMainMenu
+    left = 312
+    top = 224
+    object bFile: TMenuItem
+      Caption = 'Файл'
+      object FileSave: TMenuItem
+        Caption = 'Сохранить'
+        OnClick = FileSaveClick
+      end
+      object FileExit: TMenuItem
+        Caption = 'Выход'
+        OnClick = FileExitClick
+      end
+    end
+    object Help: TMenuItem
+      Caption = 'Справка'
+      OnClick = HelpClick
+    end
+  end
+  object SaveFile: TSaveDialog
+    DefaultExt = '.bmp'
+    left = 312
+    top = 112
+  end
+  object ColorDialog1: TColorDialog
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    left = 312
+    top = 168
+  end
+end
